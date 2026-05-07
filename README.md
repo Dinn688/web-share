@@ -1,4 +1,4 @@
-# 邻享产品介绍与部署说明
+﻿# 邻享产品介绍与部署说明
 
 ## 产品定位
 
@@ -124,10 +124,10 @@ npm run package
 
 构建完成后会生成：
 
-- `output/deploy-packages/linshare-1.0.0-windows.zip`
-- `output/deploy-packages/linshare-1.0.0-linux.tar.gz`
-- `output/deploy-packages/linshare-1.0.0-macos.tar.gz`
-- `output/deploy-packages/SHA256SUMS.txt`
+- `output/软件包/linshare-1.0.0-windows.zip`
+- `output/软件包/linshare-1.0.0-linux.tar.gz`
+- `output/软件包/linshare-1.0.0-macos.tar.gz`
+- `output/软件包/SHA256SUMS.txt`
 
 `SHA256SUMS.txt` 用于校验发布包完整性。
 

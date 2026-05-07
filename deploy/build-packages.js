@@ -5,7 +5,7 @@ const crypto = require("crypto");
 const archiver = require("archiver");
 
 const rootDir = path.resolve(__dirname, "..");
-const outputDir = path.join(rootDir, "output", "deploy-packages");
+const outputDir = path.join(rootDir, "output", "软件包");
 const stagingDir = path.join(outputDir, "staging");
 const pkg = require(path.join(rootDir, "package.json"));
 const version = pkg.version || "1.0.0";
