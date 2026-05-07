@@ -1,0 +1,3 @@
+d28407b7ada35a393ad71dacf899f080121ff3dc6e89b60ecae28f4b01c187a6  linshare-1.0.0-windows.zip
+197143859c6c7acb6c3c073ec5a0e8697798c06b7c7f1550e91fc7ec7b918b3c  linshare-1.0.0-linux.tar.gz
+77110ca58dd6473f344d2776a314aeb227d68ec32690133a6c002d4cfa94196d  linshare-1.0.0-macos.tar.gz
