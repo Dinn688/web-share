@@ -1,0 +1,9 @@
+node_modules/
+data/
+logs/
+output/
+test-results/
+.playwright-cli/
+backups/
+*.log
+server-dev*.log

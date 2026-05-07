@@ -1,0 +1,6 @@
+$env:HOST = "0.0.0.0"
+$env:PORT = "5832"
+$env:PORT_RETRY_LIMIT = "20"
+$env:DATA_DIR = ".\data"
+$env:UPLOAD_CHUNK_LIMIT_MB = "16"
+$env:DEFAULT_MAX_SHARED_STORAGE_MB = "10240"

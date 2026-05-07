@@ -1,0 +1,23 @@
+{
+  "name": "linshare",
+  "version": "1.0.0",
+  "description": "邻享 - 内部网络文件分享系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "package": "node deploy/build-packages.js"
+  },
+  "keywords": [
+    "邻享",
+    "内网",
+    "文件共享"
+  ],
+  "author": "产品团队",
+  "license": "MIT",
+  "dependencies": {
+    "archiver": "^7.0.1",
+    "express": "^4.21.2",
+    "mime-types": "^2.1.35"
+  }
+}

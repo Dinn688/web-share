@@ -1,0 +1,607 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>域享 - 文件共享中心</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body data-view="transfer">
+    <div class="app-shell">
+      <div class="desktop-flow-field" aria-hidden="true"></div>
+      <aside class="side-rail" aria-label="主导航">
+        <a class="brand-lockup" href="#transfer">
+          <span class="brand-mark"><img src="/brand-icon-simple.png" alt="" /></span>
+          <span>
+            <span class="brand-kicker">NEXUS FILEOPS</span>
+            <span class="brand-title">域享</span>
+          </span>
+        </a>
+        <nav class="rail-menu">
+          <button class="rail-item is-active" data-view-target="transfer" type="button">
+            <i data-icon="layout-dashboard"></i>
+            <span>传输台</span>
+          </button>
+          <button class="rail-item" data-view-target="shared" type="button">
+            <i data-icon="folder"></i>
+            <span>共享空间</span>
+          </button>
+          <button class="rail-item" data-view-target="peer" type="button">
+            <i data-icon="send"></i>
+            <span>对端互传</span>
+          </button>
+          <button class="rail-item" data-view-target="settings" type="button">
+            <i data-icon="settings"></i>
+            <span>设置中心</span>
+          </button>
+        </nav>
+        <div class="rail-footer">
+          <span class="status-dot"></span>
+          <span>LAN SECURE</span>
+        </div>
+      </aside>
+
+      <main class="page-shell">
+        <header class="command-bar">
+          <div class="command-title">
+            <span class="eyebrow"><span class="live-dot"></span> 内网在线</span>
+            <h1 id="pageTitle">文件共享中心</h1>
+          </div>
+          <div class="address-card" id="networkHub">
+            <i data-icon="radio-tower" aria-hidden="true"></i>
+            <div class="address-copy">
+              <span class="address-label">当前访问地址</span>
+              <div class="address-value" id="accessAddress">正在获取地址...</div>
+            </div>
+            <button class="btn btn-ghost" id="copyAddressBtn" type="button">
+              <i data-icon="copy"></i>
+              <span>复制</span>
+            </button>
+          </div>
+        </header>
+
+        <section class="overview-grid" aria-label="系统概览">
+          <article class="metric-card">
+            <div class="metric-icon cyan"><i data-icon="files"></i></div>
+            <div>
+              <span class="metric-label">共享文件</span>
+              <strong id="fileCountStat">--</strong>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon amber"><i data-icon="database"></i></div>
+            <div>
+              <span class="metric-label">已占用</span>
+              <strong id="storageUsedStat">--</strong>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon green"><i data-icon="activity"></i></div>
+            <div>
+              <span class="metric-label">传输任务</span>
+              <strong id="activeTaskStat">0</strong>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon steel"><i data-icon="clock"></i></div>
+            <div>
+              <span class="metric-label">最近同步</span>
+              <strong id="lastSyncStat">--</strong>
+            </div>
+          </article>
+        </section>
+
+        <section class="view-panel is-active" id="transferView">
+          <section class="panel upload-panel">
+            <div class="panel-head">
+              <div>
+                <span class="section-tag">Upload Dock</span>
+                <h2>高速投递</h2>
+              </div>
+              <label class="switch-row compact-switch">
+                <input id="resumeUploadSwitch" type="checkbox" checked />
+                <span class="switch-ui"></span>
+                <span>分片续传</span>
+              </label>
+            </div>
+
+            <div class="drop-zone" id="dropZone" tabindex="0" role="button" aria-label="文件上传区域">
+              <div class="upload-orbit" aria-hidden="true">
+                <span class="upload-core"><i data-icon="cloud-upload"></i></span>
+              </div>
+              <div class="drop-copy">
+                <p class="drop-main">拖入文件，启动高速投递</p>
+                <p class="drop-sub">面向局域网协作的私域传输跑道。上传完成后四小时内可在此快速下载，历史文件归档至共享空间。</p>
+                <p class="drop-tip" id="dropTip">等待新任务</p>
+              </div>
+              <button class="btn btn-primary" id="pickFilesBtn" type="button">
+                <i data-icon="plus"></i>
+                <span>选择文件</span>
+              </button>
+              <input id="fileInput" type="file" multiple hidden />
+            </div>
+            <div class="task-list" id="uploadQueue" aria-live="polite"></div>
+          </section>
+
+          <section class="panel library-panel">
+            <div class="library-head">
+              <div>
+                <span class="section-tag">Fresh Window</span>
+                <h2>四小时内最新上传</h2>
+              </div>
+              <div class="library-status">
+                <i data-icon="clock"></i>
+                <span>最近 4 小时</span>
+              </div>
+            </div>
+            <div class="file-list compact-list" id="recentFileList"></div>
+            <div class="empty-state" id="recentEmptyState">
+              <i data-icon="folder-open"></i>
+              <span>四小时内无最新上传文件，下载文件请到共享空间下载</span>
+            </div>
+          </section>
+        </section>
+
+        <section class="view-panel" id="sharedView">
+          <section class="panel shared-panel">
+            <div class="panel-head">
+              <div>
+                <span class="section-tag">Data Room</span>
+                <h2>共享空间</h2>
+              </div>
+              <div class="batch-actions top-actions">
+                <span class="selection-chip" id="selectedCount">已选择 0 项</span>
+                <button class="btn btn-secondary" id="batchDownloadBtn" type="button">
+                  <i data-icon="archive"></i>
+                  <span>批量下载</span>
+                </button>
+                <button class="btn btn-danger" id="batchDeleteBtn" type="button">
+                  <i data-icon="trash-2"></i>
+                  <span>批量删除</span>
+                </button>
+              </div>
+            </div>
+
+            <div class="filter-grid">
+              <label class="field search-field">
+                <span>关键词搜索</span>
+                <i data-icon="search"></i>
+                <input id="searchInput" type="search" placeholder="输入文件名关键词" />
+              </label>
+              <label class="field">
+                <span>时间范围</span>
+                <select id="timeRangeSelect">
+                  <option value="all">全部</option>
+                  <option value="today">今天</option>
+                  <option value="7d">近 7 天</option>
+                  <option value="custom">自定义</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>文件类型</span>
+                <select id="typeSelect">
+                  <option value="all">全部</option>
+                  <option value="image">图片</option>
+                  <option value="document">文档</option>
+                  <option value="archive">压缩包</option>
+                  <option value="video">视频</option>
+                  <option value="audio">音频</option>
+                  <option value="other">其他</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>排序字段</span>
+                <select id="sortBySelect">
+                  <option value="uploadedAt">上传时间</option>
+                  <option value="size">文件大小</option>
+                  <option value="name">文件名</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>排序顺序</span>
+                <select id="sortOrderSelect">
+                  <option value="desc">降序</option>
+                  <option value="asc">升序</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>每页条数</span>
+                <select id="pageSizeSelect">
+                  <option value="10">10 条</option>
+                  <option value="20">20 条</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="custom-range hidden" id="customRange">
+              <label class="field">
+                <span>开始日期</span>
+                <input id="startDateInput" type="date" />
+              </label>
+              <label class="field">
+                <span>结束日期</span>
+                <input id="endDateInput" type="date" />
+              </label>
+            </div>
+
+            <div class="table-wrap">
+              <table class="file-table">
+                <thead>
+                  <tr>
+                    <th class="check-cell"><input id="selectPageCheckbox" type="checkbox" aria-label="选择当前页" /></th>
+                    <th>文件名</th>
+                    <th>类型</th>
+                    <th>大小</th>
+                    <th>上传时间</th>
+                    <th>操作</th>
+                  </tr>
+                </thead>
+                <tbody id="sharedFileTable"></tbody>
+              </table>
+              <div class="empty-state table-empty" id="sharedEmptyState">
+                <i data-icon="folder-open"></i>
+                <span>暂无匹配文件</span>
+              </div>
+            </div>
+
+            <div class="pagination-bar">
+              <span id="paginationInfo">--</span>
+              <div class="pagination-actions">
+                <button class="btn btn-secondary" id="prevPageBtn" type="button">上一页</button>
+                <button class="btn btn-secondary" id="nextPageBtn" type="button">下一页</button>
+              </div>
+            </div>
+          </section>
+        </section>
+
+        <section class="view-panel" id="peerView">
+          <section class="peer-grid" aria-label="对端互传入口">
+            <article class="panel peer-card send-card" id="openPeerUpload" tabindex="0" role="button">
+              <div class="peer-card-glow" aria-hidden="true"></div>
+              <div class="peer-card-main">
+                <div class="peer-card-content">
+                  <div class="peer-card-topline">
+                    <span class="section-tag">Secure Send</span>
+                    <span class="peer-status-chip">发起传输</span>
+                  </div>
+                  <h2>我要上传</h2>
+                  <p>生成传输码，选择文件并交给对端接收。</p>
+                  <div class="peer-card-meta">
+                    <span>有效期可控</span>
+                    <span>完成后复制传输码</span>
+                  </div>
+                </div>
+                <div class="peer-card-visual send-visual" aria-hidden="true">
+                  <span class="peer-orbit orbit-a"></span>
+                  <span class="peer-orbit orbit-b"></span>
+                  <span class="peer-trace"></span>
+                  <svg class="peer-visual-svg" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="40" y="32" width="70" height="90" rx="16" fill="url(#sendSheet)" />
+                    <path d="M86 32v28h24" fill="#DDF8F4" />
+                    <path d="M58 78h28M58 94h38" stroke="#0F766E" stroke-width="8" stroke-linecap="round" />
+                    <circle cx="40" cy="120" r="13" fill="#F59E0B" />
+                    <circle cx="122" cy="58" r="12" fill="#14B8A6" />
+                    <path d="M55 116c20-8 40-24 58-48" stroke="#0D9488" stroke-width="7" stroke-linecap="round" />
+                    <path d="M99 66h15V51" stroke="#0D9488" stroke-width="7" stroke-linecap="round" stroke-linejoin="round" />
+                    <defs>
+                      <linearGradient id="sendSheet" x1="40" y1="32" x2="110" y2="122" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#FFFFFF" />
+                        <stop offset="1" stop-color="#E7FBF6" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <div class="peer-card-action">
+                  <span>打开上传舱</span>
+                  <i data-icon="send"></i>
+                </div>
+              </div>
+            </article>
+            <article class="panel peer-card receive-card" id="openPeerReceive" tabindex="0" role="button">
+              <div class="peer-card-glow" aria-hidden="true"></div>
+              <div class="peer-card-main">
+                <div class="peer-card-content">
+                  <div class="peer-card-topline">
+                    <span class="section-tag">Code Receive</span>
+                    <span class="peer-status-chip warm">凭码取件</span>
+                  </div>
+                  <h2>我要接收</h2>
+                  <p>输入传输码，查看清单并下载对端文件。</p>
+                  <div class="peer-card-meta">
+                    <span>文件清单预览</span>
+                    <span>过期状态明确</span>
+                  </div>
+                </div>
+                <div class="peer-card-visual receive-visual" aria-hidden="true">
+                  <span class="peer-orbit orbit-a"></span>
+                  <span class="peer-orbit orbit-b"></span>
+                  <span class="peer-trace"></span>
+                  <svg class="peer-visual-svg" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <rect x="38" y="50" width="84" height="72" rx="18" fill="url(#receiveBox)" />
+                    <path d="M56 72h48" stroke="#FFF7ED" stroke-width="8" stroke-linecap="round" />
+                    <path d="M80 44v43M64 73l16 16 16-16" stroke="#FFFFFF" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" />
+                    <path d="M58 104h44" stroke="#FFF7ED" stroke-width="8" stroke-linecap="round" />
+                    <circle cx="43" cy="124" r="11" fill="#14B8A6" />
+                    <circle cx="123" cy="41" r="12" fill="#F97316" />
+                    <defs>
+                      <linearGradient id="receiveBox" x1="34" y1="48" x2="126" y2="122" gradientUnits="userSpaceOnUse">
+                        <stop stop-color="#F97316" />
+                        <stop offset="1" stop-color="#FBBF24" />
+                      </linearGradient>
+                    </defs>
+                  </svg>
+                </div>
+                <div class="peer-card-action warm">
+                  <span>打开接收舱</span>
+                  <i data-icon="download"></i>
+                </div>
+              </div>
+            </article>
+          </section>
+          <section class="peer-ambient-panel" aria-hidden="true">
+            <div class="peer-orbit-field">
+              <span class="ambient-node node-a"></span>
+              <span class="ambient-node node-b"></span>
+              <span class="ambient-node node-c"></span>
+              <span class="ambient-node node-d"></span>
+              <span class="ambient-path path-a"></span>
+              <span class="ambient-path path-b"></span>
+              <span class="ambient-signal signal-a"></span>
+              <span class="ambient-signal signal-b"></span>
+            </div>
+          </section>
+        </section>
+
+        <section class="view-panel" id="settingsView">
+          <section class="panel settings-panel">
+            <div class="panel-head">
+              <div>
+                <span class="section-tag">Control Center</span>
+                <h2>设置中心</h2>
+              </div>
+              <button class="btn btn-primary" id="saveSettingsBtn" type="button">
+                <i data-icon="save"></i>
+                <span>保存设置</span>
+              </button>
+            </div>
+            <div class="settings-grid">
+              <label class="setting-line">
+                <span>
+                  <strong>自动同步设置</strong>
+                  <small>控制文件是否自动同步到局域网其他设备</small>
+                </span>
+                <span class="switch-row">
+                  <input id="autoSyncSwitch" type="checkbox" />
+                  <span class="switch-ui"></span>
+                </span>
+              </label>
+              <label class="field">
+                <span>主题风格</span>
+                <select id="themeSelect">
+                  <option value="light">浅色</option>
+                  <option value="system">跟随系统</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>默认上传路径</span>
+                <input id="defaultUploadPathInput" type="text" placeholder="服务器默认存储目录" />
+              </label>
+              <label class="field">
+                <span>分片上传大小</span>
+                <input id="chunkSizeInput" type="number" min="1" max="128" step="1" />
+              </label>
+              <label class="setting-line">
+                <span>
+                  <strong>通知开关</strong>
+                  <small>上传、下载、删除结果提示</small>
+                </span>
+                <span class="switch-row">
+                  <input id="notificationsSwitch" type="checkbox" />
+                  <span class="switch-ui"></span>
+                </span>
+              </label>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <section class="mobile-shell" aria-label="移动端文件共享">
+      <header class="mobile-hero">
+        <div class="mobile-brand-row">
+          <span class="brand-mark"><img src="/brand-icon-simple.png" alt="" /></span>
+          <div>
+            <span class="mobile-kicker">LAN FILEOPS</span>
+            <strong>域享</strong>
+          </div>
+          <span class="mobile-live"><span class="live-dot"></span> 在线</span>
+        </div>
+        <div class="mobile-address-card">
+          <div>
+            <span>当前访问地址</span>
+            <strong id="mobileAccessAddress">正在获取地址...</strong>
+          </div>
+        </div>
+      </header>
+
+      <nav class="mobile-tabs" aria-label="移动端导航">
+        <button class="mobile-tab is-active" data-mobile-view-target="transfer" type="button">
+          <i data-icon="layout-dashboard"></i>
+          <span>传输台</span>
+        </button>
+        <button class="mobile-tab" data-mobile-view-target="shared" type="button">
+          <i data-icon="folder"></i>
+          <span>共享空间</span>
+        </button>
+        <button class="mobile-tab" data-mobile-view-target="peer" type="button">
+          <i data-icon="send"></i>
+          <span>对端互传</span>
+        </button>
+      </nav>
+
+      <main class="mobile-main">
+        <section class="mobile-view-panel is-active" id="mobileTransferView">
+          <div class="mobile-section-head">
+            <span class="section-tag">Upload</span>
+            <h2 id="mobilePageTitle">传输台</h2>
+          </div>
+          <section class="mobile-upload-card">
+            <div class="mobile-upload-icon"><i data-icon="cloud-upload"></i></div>
+            <div>
+              <h3>选择文件上传</h3>
+              <p>面向局域网快速投递，上传完成后会进入共享空间。</p>
+            </div>
+            <button class="btn btn-primary mobile-primary-action" id="mobilePickFilesBtn" type="button">
+              <i data-icon="plus"></i>
+              <span>选择文件</span>
+            </button>
+            <input id="mobileFileInput" type="file" multiple hidden />
+          </section>
+          <div class="mobile-stat-strip" aria-label="移动端概览">
+            <article>
+              <span>共享文件</span>
+              <strong id="mobileFileCountStat">--</strong>
+            </article>
+            <article>
+              <span>已占用</span>
+              <strong id="mobileStorageUsedStat">--</strong>
+            </article>
+          </div>
+          <section class="mobile-card">
+            <div class="mobile-card-head">
+              <h3>上传任务</h3>
+              <span id="mobileActiveTaskStat">0</span>
+            </div>
+            <div class="mobile-task-list" id="mobileUploadQueue" aria-live="polite"></div>
+          </section>
+          <section class="mobile-card">
+            <div class="mobile-card-head">
+              <h3>最近 4 小时</h3>
+              <span id="mobileLastSyncStat">--</span>
+            </div>
+            <div class="mobile-file-list" id="mobileRecentFileList"></div>
+            <div class="mobile-empty-state" id="mobileRecentEmptyState">
+              <i data-icon="folder-open"></i>
+              <span>暂无最新上传文件</span>
+            </div>
+          </section>
+        </section>
+
+        <section class="mobile-view-panel" id="mobileSharedView">
+          <div class="mobile-section-head">
+            <span class="section-tag">Files</span>
+            <h2>共享空间</h2>
+          </div>
+          <section class="mobile-filter-card">
+            <label class="field search-field">
+              <span>搜索文件</span>
+              <i data-icon="search"></i>
+              <input id="mobileSearchInput" type="search" placeholder="输入文件名关键词" />
+            </label>
+            <div class="mobile-filter-row">
+              <label class="field">
+                <span>类型</span>
+                <select id="mobileTypeSelect">
+                  <option value="all">全部</option>
+                  <option value="image">图片</option>
+                  <option value="document">文档</option>
+                  <option value="archive">压缩包</option>
+                  <option value="video">视频</option>
+                  <option value="audio">音频</option>
+                  <option value="other">其他</option>
+                </select>
+              </label>
+              <label class="field">
+                <span>排序</span>
+                <select id="mobileSortSelect">
+                  <option value="uploadedAt:desc">最新上传</option>
+                  <option value="name:asc">文件名</option>
+                  <option value="size:desc">文件大小</option>
+                </select>
+              </label>
+            </div>
+          </section>
+          <div class="mobile-file-list" id="mobileSharedFileList"></div>
+          <div class="mobile-empty-state" id="mobileSharedEmptyState">
+            <i data-icon="folder-open"></i>
+            <span>暂无匹配文件</span>
+          </div>
+          <div class="mobile-pagination">
+            <button class="btn btn-secondary" id="mobilePrevPageBtn" type="button">上一页</button>
+            <span id="mobilePaginationInfo">--</span>
+            <button class="btn btn-secondary" id="mobileNextPageBtn" type="button">下一页</button>
+          </div>
+        </section>
+
+        <section class="mobile-view-panel" id="mobilePeerView">
+          <div class="mobile-section-head">
+            <span class="section-tag">Peer</span>
+            <h2>对端互传</h2>
+          </div>
+          <button class="mobile-peer-action send" id="mobileOpenPeerUpload" type="button">
+            <span>
+              <small>Secure Send</small>
+              <strong>我要上传</strong>
+              <em>生成传输码并选择文件</em>
+            </span>
+            <i data-icon="send"></i>
+          </button>
+          <button class="mobile-peer-action receive" id="mobileOpenPeerReceive" type="button">
+            <span>
+              <small>Code Receive</small>
+              <strong>我要接收</strong>
+              <em>输入传输码下载文件</em>
+            </span>
+            <i data-icon="download"></i>
+          </button>
+        </section>
+      </main>
+    </section>
+
+    <div class="modal hidden" id="confirmModal" aria-hidden="true">
+      <div class="modal-panel" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <div class="modal-icon"><i data-icon="triangle-alert"></i></div>
+        <h3 id="confirmTitle">确认操作</h3>
+        <p id="confirmMessage">确定继续吗？</p>
+        <div class="modal-actions">
+          <button class="btn btn-secondary" id="confirmCancelBtn" type="button">取消</button>
+          <button class="btn btn-danger" id="confirmOkBtn" type="button">确定</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="peerUploadModal" aria-hidden="true">
+      <div class="modal-panel wide-panel peer-modal-panel" role="dialog" aria-modal="true" aria-labelledby="peerUploadTitle">
+        <div class="modal-head">
+          <div>
+            <span class="section-tag">Peer Transfer</span>
+            <h3 id="peerUploadTitle">我要上传</h3>
+          </div>
+          <button class="icon-btn" id="closePeerUploadBtn" type="button" aria-label="关闭">
+            <i data-icon="x"></i>
+          </button>
+        </div>
+        <div id="peerUploadBody"></div>
+      </div>
+    </div>
+
+    <div class="modal hidden" id="peerReceiveModal" aria-hidden="true">
+      <div class="modal-panel wide-panel peer-modal-panel" role="dialog" aria-modal="true" aria-labelledby="peerReceiveTitle">
+        <div class="modal-head">
+          <div>
+            <span class="section-tag">Peer Transfer</span>
+            <h3 id="peerReceiveTitle">我要接收</h3>
+          </div>
+          <button class="icon-btn" id="closePeerReceiveBtn" type="button" aria-label="关闭">
+            <i data-icon="x"></i>
+          </button>
+        </div>
+        <div id="peerReceiveBody"></div>
+      </div>
+    </div>
+
+    <div class="toast-wrap" id="toastContainer"></div>
+    <script src="/transfer-utils.js" defer></script>
+    <script src="/app.js" defer></script>
+  </body>
+</html>

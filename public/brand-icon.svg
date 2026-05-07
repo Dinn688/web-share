@@ -1,0 +1,22 @@
+<svg width="128" height="128" viewBox="0 0 128 128" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="域享文件共享中心标识">
+  <rect width="128" height="128" rx="26" fill="url(#bg)"/>
+  <rect x="10" y="10" width="108" height="108" rx="21" stroke="white" stroke-opacity=".58" stroke-width="2"/>
+  <path d="M41 31h31l18 18v45a7 7 0 0 1-7 7H41a7 7 0 0 1-7-7V38a7 7 0 0 1 7-7Z" fill="url(#sheet)" stroke="white" stroke-opacity=".72" stroke-width="2"/>
+  <path d="M72 31v18h18" fill="#DDF9F4"/>
+  <path d="M49 63h31M49 76h23" stroke="#0F766E" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="36" cy="91" r="9" fill="#FBBF24" stroke="white" stroke-width="4"/>
+  <circle cx="94" cy="61" r="9" fill="#14B8A6" stroke="white" stroke-width="4"/>
+  <circle cx="82" cy="96" r="7" fill="#F97316" stroke="white" stroke-width="4"/>
+  <path d="M45 88c13-3 25-10 39-24M49 94c10 2 18 2 27 1" stroke="white" stroke-opacity=".88" stroke-width="5" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="bg" x1="22" y1="10" x2="108" y2="118" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#DFF8F4"/>
+      <stop offset=".52" stop-color="#14B8A6"/>
+      <stop offset="1" stop-color="#F59E0B"/>
+    </linearGradient>
+    <linearGradient id="sheet" x1="34" y1="31" x2="90" y2="101" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FFFFFF"/>
+      <stop offset="1" stop-color="#E9FFFA"/>
+    </linearGradient>
+  </defs>
+</svg>

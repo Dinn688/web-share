@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>域享 - 后台管理</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="admin-page" data-view="transfer">
+    <section class="admin-login-wrap" id="adminLoginSection">
+      <form class="admin-login-card panel" id="adminLoginForm">
+        <span class="brand-mark"><img src="/brand-icon-simple.png" alt="" /></span>
+        <div>
+          <span class="section-tag">Admin Console</span>
+          <h1>后台管理</h1>
+          <p>使用管理员账号进入文件治理台</p>
+        </div>
+        <label class="field">
+          <span>管理员账号</span>
+          <input id="adminUsername" name="username" autocomplete="username" value="admin" />
+        </label>
+        <label class="field">
+          <span>管理员密码</span>
+          <input id="adminPassword" name="password" type="password" autocomplete="current-password" />
+        </label>
+        <button class="btn btn-primary" type="submit">
+          <i data-icon="shield-check"></i>
+          <span>登录后台</span>
+        </button>
+        <p class="admin-form-message" id="adminLoginMessage"></p>
+      </form>
+    </section>
+
+    <div class="app-shell admin-shell hidden" id="adminApp" aria-live="polite">
+      <aside class="side-rail" aria-label="后台导航">
+        <a class="brand-lockup" href="/admin">
+          <span class="brand-mark"><img src="/brand-icon-simple.png" alt="" /></span>
+          <span>
+            <span class="brand-kicker">NEXUS ADMIN</span>
+            <span class="brand-title">域享</span>
+          </span>
+        </a>
+        <nav class="rail-menu">
+          <a class="rail-item is-active" href="#adminFiles">
+            <i data-icon="files"></i>
+            <span>文件管理</span>
+          </a>
+          <a class="rail-item" href="#adminSettings">
+            <i data-icon="settings"></i>
+            <span>系统设置</span>
+          </a>
+          <a class="rail-item" href="/">
+            <i data-icon="layout-dashboard"></i>
+            <span>返回前台</span>
+          </a>
+        </nav>
+        <div class="rail-footer">
+          <span class="status-dot"></span>
+          <span>ADMIN SECURE</span>
+        </div>
+      </aside>
+
+      <main class="page-shell admin-workspace">
+        <header class="command-bar admin-command-bar">
+          <div class="command-title">
+            <span class="eyebrow"><span class="live-dot"></span> 管理员在线</span>
+            <h1>后台管理</h1>
+          </div>
+          <div class="address-card">
+            <i data-icon="user-cog" aria-hidden="true"></i>
+            <div class="address-copy">
+              <span class="address-label">当前账号</span>
+              <div class="address-value" id="adminAccountLabel">admin</div>
+            </div>
+            <button class="btn btn-ghost" id="adminLogoutBtn" type="button">
+              <i data-icon="log-out"></i>
+              <span>退出</span>
+            </button>
+          </div>
+        </header>
+
+        <section class="overview-grid admin-overview" aria-label="后台概览">
+          <article class="metric-card">
+            <div class="metric-icon cyan"><i data-icon="files"></i></div>
+            <div>
+              <span class="metric-label">全部文件</span>
+              <strong id="adminTotalFilesStat">--</strong>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon green"><i data-icon="folder"></i></div>
+            <div>
+              <span class="metric-label">共享文件</span>
+              <strong id="adminSharedFilesStat">--</strong>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon amber"><i data-icon="send"></i></div>
+            <div>
+              <span class="metric-label">对端文件</span>
+              <strong id="adminPeerFilesStat">--</strong>
+            </div>
+          </article>
+          <article class="metric-card">
+            <div class="metric-icon steel"><i data-icon="database"></i></div>
+            <div>
+              <span class="metric-label">共享占用</span>
+              <strong id="adminStorageUsedStat">--</strong>
+            </div>
+          </article>
+        </section>
+
+        <section class="panel shared-panel admin-panel" id="adminFiles">
+          <div class="panel-head">
+            <div>
+              <span class="section-tag">File Governance</span>
+              <h2>上传文件管理</h2>
+            </div>
+            <div class="batch-actions top-actions">
+              <span class="selection-chip" id="adminSelectedCount">已选择 0 项</span>
+              <button class="btn btn-danger" id="adminBatchDeleteBtn" type="button" disabled>
+                <i data-icon="trash-2"></i>
+                <span>批量删除</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="filter-grid admin-filter-row">
+            <label class="field search-field">
+              <span>查询文件</span>
+              <i data-icon="search"></i>
+              <input id="adminSearchInput" type="search" placeholder="文件名、IP 或传输码" />
+            </label>
+            <label class="field">
+              <span>上传类型</span>
+              <select id="adminUploadTypeFilter">
+                <option value="all">全部类型</option>
+                <option value="shared">共享文件</option>
+                <option value="peer">对端互传文件</option>
+              </select>
+            </label>
+            <label class="field">
+              <span>文件类型</span>
+              <select id="adminCategoryFilter">
+                <option value="all">全部文件</option>
+                <option value="image">图片</option>
+                <option value="document">文档</option>
+                <option value="archive">压缩包</option>
+                <option value="video">视频</option>
+                <option value="audio">音频</option>
+                <option value="other">其他</option>
+              </select>
+            </label>
+            <button class="btn btn-secondary" id="adminRefreshBtn" type="button">
+              <i data-icon="rotate-ccw"></i>
+              <span>刷新</span>
+            </button>
+          </div>
+
+          <div class="table-wrap">
+            <table class="file-table admin-table">
+              <thead>
+                <tr>
+                  <th class="check-cell"><input id="adminSelectPageCheckbox" type="checkbox" aria-label="选择当前页" /></th>
+                  <th>文件名</th>
+                  <th data-admin-column="uploadType">上传类型</th>
+                  <th>文件类型</th>
+                  <th>大小</th>
+                  <th data-admin-column="uploaderIp">上传者 IP</th>
+                  <th>上传时间</th>
+                  <th>操作</th>
+                </tr>
+              </thead>
+              <tbody id="adminFileTable"></tbody>
+            </table>
+            <div class="empty-state table-empty" id="adminEmptyState">
+              <i data-icon="folder-open"></i>
+              <span>暂无匹配文件</span>
+            </div>
+          </div>
+
+          <div class="pagination-bar">
+            <span id="adminPaginationInfo">--</span>
+            <div class="pagination-actions">
+              <button class="btn btn-secondary" id="adminPrevPageBtn" type="button">上一页</button>
+              <button class="btn btn-secondary" id="adminNextPageBtn" type="button">下一页</button>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel settings-panel admin-panel" id="adminSettings">
+          <div class="panel-head">
+            <div>
+              <span class="section-tag">System Controls</span>
+              <h2>系统设置</h2>
+            </div>
+          </div>
+
+          <div class="admin-settings-grid">
+            <form class="admin-setting-card" id="adminStorageForm">
+              <div>
+                <strong>共享空间容量</strong>
+                <small>控制共享文件最多可占用的存储空间，对端互传文件不计入该容量。</small>
+              </div>
+              <label class="field">
+                <span>最大容量（MB）</span>
+                <input id="adminStorageLimitInput" type="number" min="1" max="1048576" step="1" />
+              </label>
+              <div class="storage-meter">
+                <div class="storage-meter-bar"><span id="adminStorageMeterFill"></span></div>
+                <p id="adminStorageMeterText">--</p>
+              </div>
+              <button class="btn btn-primary" type="submit">
+                <i data-icon="save"></i>
+                <span>保存容量</span>
+              </button>
+            </form>
+
+            <form class="admin-setting-card" id="adminPasswordForm">
+              <div>
+                <strong>管理员密码</strong>
+                <small>修改后请使用新密码重新登录后台。</small>
+              </div>
+              <label class="field">
+                <span>当前密码</span>
+                <input id="currentAdminPassword" type="password" autocomplete="current-password" />
+              </label>
+              <label class="field">
+                <span>新密码</span>
+                <input id="newAdminPassword" type="password" autocomplete="new-password" />
+              </label>
+              <label class="field">
+                <span>确认新密码</span>
+                <input id="confirmAdminPassword" type="password" autocomplete="new-password" />
+              </label>
+              <button class="btn btn-primary" type="submit">
+                <i data-icon="key-round"></i>
+                <span>修改密码</span>
+              </button>
+            </form>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="toast-wrap" id="toastContainer" aria-live="polite"></div>
+    <script src="/admin.js"></script>
+  </body>
+</html>
